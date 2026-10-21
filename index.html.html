@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOJO: DIAMOND RUN!</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:ital,wght@0,700;0,900;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="background-decorations">
+        <div class="speed-lines"></div>
+        <div class="menacing-kanji k1">ゴ</div>
+        <div class="menacing-kanji k2">ゴ</div>
+        <div class="menacing-kanji k3">ゴ</div>
+        <div class="menacing-kanji k4">ゴ</div>
+    </div>
+
+    <header class="game-header">
+        <h1 class="game-title">
+            <span class="title-sub">DIAMOND IS UNBREAKABLE</span>
+            <span class="title-main">JOJO: DIAMOND RUN!</span>
+        </h1>
+        <p class="game-subtitle">Uma corrida bizarra pelas ruas de Morioh!</p>
+    </header>
+
+    <main class="game-container">
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="900" height="400"></canvas>
+            
+            <button id="soundToggle" class="sound-btn" aria-label="Alternar som">
+                🔊
+            </button>
+
+            <!-- Overlay de Início / Game Over / Vitória -->
+            <div id="gameOverlay" class="overlay active">
+                <div class="overlay-card">
+                    <h2 id="overlayTitle" class="overlay-title">PRONTO, JOSUKE?</h2>
+                    
+                    <div id="scoreDisplayContainer" class="score-summary hidden">
+                        <div class="score-box">
+                            <span class="label">PONTUAÇÃO ATUAL</span>
+                            <span id="finalScore" class="val">0</span>
+                        </div>
+                        <div class="score-box highlight">
+                            <span class="label">RECORDE SUPREMO</span>
+                            <span id="highScoreOverlay" class="val">0</span>
+                        </div>
+                    </div>
+
+                    <p id="overlayInstructions" class="instructions-prompt">
+                        Pressione <strong>ESPAÇO</strong> ou toque na tela para começar!
+                    </p>
+
+                    <button id="startBtn" class="jojo-btn">
+                        <span class="btn-text">INICIAR CORRIDA!</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="how-to-play-banner">
+            <span class="badge">COMO JOGAR</span>
+            <p>Ajude Josuke Higashikata a enfrentar os perigos de Morioh, desviar dos inimigos e chegar ao final da cidade!<br>
+            <strong>Espaço</strong> / <strong>Seta para Cima</strong> / <strong>Toque na tela</strong>: Pular | <strong>Tecla R</strong>: Reiniciar</p>
+        </div>
+    </main>
+
+    <section class="about-section">
+        <div class="about-card">
+            <h2>SOBRE O JOGO</h2>
+            <p>Em <strong>JOJO: DIAMOND RUN!</strong>, acompanhe Josuke Higashikata em uma busca implacável pelas ruas de Morioh para deter Yoshikage Kira. Evite os ataques de Angelo e Akira Otoishi usando o poder restaurador e a força bruta do <strong>Crazy Diamond</strong>!</p>
+            <div class="stats-counter">
+                <span>SEU MAIOR RECORDE SALVO:</span>
+                <strong id="savedHighScore">0</strong>
+            </div>
+        </div>
+    </section>
+
+    <footer class="game-footer">
+        <p>MORIOH-CHO RADIO &bull; CRAZY DIAMOND IS UNBREAKABLE</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

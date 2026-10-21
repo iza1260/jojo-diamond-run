@@ -1,0 +1,404 @@
+/* Reset & Fontes */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background-color: #1a0033;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Fundo Psicodélico estilo Morioh */
+.background-decorations {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: radial-gradient(circle at 50% 30%, #4a0080 0%, #1a0033 70%);
+    overflow: hidden;
+}
+
+.speed-lines {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 230, 0, 0.05) 0deg 10deg, transparent 10deg 20deg);
+    animation: rotateLines 60s linear infinite;
+}
+
+@keyframes rotateLines {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.menacing-kanji {
+    position: absolute;
+    font-family: 'Bangers', cursive;
+    font-size: 8rem;
+    color: rgba(255, 0, 128, 0.18);
+    text-shadow: 4px 4px 0px rgba(0, 255, 204, 0.2);
+    animation: floatKanji 4s ease-in-out infinite alternate;
+}
+
+.k1 { top: 10%; left: 5%; animation-delay: 0s; }
+.k2 { top: 60%; left: 85%; animation-delay: 1s; font-size: 10rem; }
+.k3 { top: 75%; left: 10%; animation-delay: 2s; }
+.k4 { top: 15%; left: 80%; animation-delay: 1.5s; }
+
+@keyframes floatKanji {
+    0% { transform: translateY(0) scale(1) rotate(-5deg); }
+    100% { transform: translateY(-20px) scale(1.1) rotate(5deg); }
+}
+
+/* Header */
+.game-header {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 0 15px;
+}
+
+.game-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 0.9;
+}
+
+.title-sub {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    color: #00ffcc;
+    letter-spacing: 4px;
+    text-shadow: 2px 2px 0px #ff007f;
+}
+
+.title-main {
+    font-family: 'Bangers', cursive;
+    font-size: 4rem;
+    background: linear-gradient(180deg, #fff 0%, #ffe600 50%, #ff007f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(4px 4px 0px #1a0033) drop-shadow(-2px -2px 0px #00ffcc);
+    transform: skewX(-5deg);
+}
+
+.game-subtitle {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #ffe600;
+    letter-spacing: 1.5px;
+    margin-top: 8px;
+    text-transform: uppercase;
+}
+
+/* Canvas */
+.game-container {
+    width: 100%;
+    max-width: 940px;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 4;
+    max-height: 400px;
+    border: 5px solid #ffe600;
+    box-shadow: 0 0 25px rgba(255, 230, 0, 0.5), inset 0 0 15px rgba(0, 0, 0, 0.5);
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Botão de Som */
+.sound-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff007f;
+    border: 2px solid #ffe600;
+    color: #fff;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 3px 3px 0 #000;
+    transition: transform 0.1s;
+}
+
+.sound-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 #000;
+}
+
+/* Overlay Tela */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 0, 51, 0.88);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.overlay-card {
+    background: linear-gradient(135deg, #3d0066 0%, #1a0033 100%);
+    border: 4px solid #00ffcc;
+    box-shadow: 8px 8px 0px #ff007f;
+    padding: 30px;
+    text-align: center;
+    max-width: 90%;
+    width: 440px;
+    transform: rotate(-1deg);
+}
+
+.overlay-title {
+    font-family: 'Bangers', cursive;
+    font-size: 2.5rem;
+    color: #ffe600;
+    text-shadow: 3px 3px 0 #ff007f;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+.score-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.score-summary.hidden {
+    display: none;
+}
+
+.score-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #00ffcc;
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.score-box.highlight {
+    border-color: #ffe600;
+}
+
+.score-box .label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #00ffcc;
+    margin-bottom: 4px;
+}
+
+.score-box.highlight .label {
+    color: #ffe600;
+}
+
+.score-box .val {
+    font-family: 'Bangers', cursive;
+    font-size: 2rem;
+    color: #fff;
+}
+
+.instructions-prompt {
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    color: #ddd;
+    line-height: 1.4;
+}
+
+.instructions-prompt strong {
+    color: #00ffcc;
+}
+
+/* Botão Estilo JoJo */
+.jojo-btn {
+    position: relative;
+    background: #ff007f;
+    color: #fff;
+    border: 3px solid #ffe600;
+    padding: 12px 30px;
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 5px 5px 0 #00ffcc;
+    transform: skewX(-10deg);
+    transition: all 0.1s ease;
+    width: 100%;
+}
+
+.jojo-btn:hover {
+    background: #ff1a8c;
+    transform: skewX(-10deg) scale(1.03);
+    box-shadow: 7px 7px 0 #00ffcc;
+}
+
+.jojo-btn:active {
+    transform: skewX(-10deg) translate(3px, 3px);
+    box-shadow: 2px 2px 0 #00ffcc;
+}
+
+.btn-text {
+    display: inline-block;
+    transform: skewX(10deg);
+}
+
+/* Instruções Abaixo */
+.how-to-play-banner {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border-left: 5px solid #00ffcc;
+    padding: 12px 20px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.how-to-play-banner .badge {
+    background: #00ffcc;
+    color: #1a0033;
+    font-family: 'Bangers', cursive;
+    padding: 4px 10px;
+    font-size: 1.1rem;
+    white-space: nowrap;
+}
+
+.how-to-play-banner p {
+    font-size: 0.85rem;
+    color: #eee;
+    line-height: 1.4;
+}
+
+/* Seção Sobre */
+.about-section {
+    width: 100%;
+    max-width: 940px;
+    padding: 20px 15px;
+    margin-top: 10px;
+}
+
+.about-card {
+    background: rgba(61, 0, 102, 0.6);
+    border: 2px solid #ffe600;
+    padding: 20px;
+    border-radius: 6px;
+}
+
+.about-card h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    color: #ffe600;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.about-card p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.stats-counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #00ffcc;
+}
+
+.stats-counter strong {
+    font-family: 'Bangers', cursive;
+    font-size: 1.6rem;
+    color: #ffe600;
+}
+
+/* Footer */
+.game-footer {
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #aa66cc;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+/* Responsividade Mobile */
+@media (max-width: 600px) {
+    .title-main {
+        font-size: 2.8rem;
+    }
+    
+    .title-sub {
+        font-size: 1.3rem;
+    }
+
+    .how-to-play-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .overlay-card {
+        padding: 20px;
+    }
+
+    .overlay-title {
+        font-size: 1.8rem;
+    }
+
+    .jojo-btn {
+        font-size: 1.4rem;
+    }
+}
