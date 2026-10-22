@@ -290,92 +290,89 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================
     let bgOffset = 0;
 
-    // Prédios/Lojas com posições fixas sequenciais para movimento fluido
-    const buildings = [];
-    const NUM_BUILDINGS = 12;
-    const BUILDING_WIDTH = 120;
-    
-    for (let i = 0; i < NUM_BUILDINGS; i++) {
-        buildings.push({
-            x: i * BUILDING_WIDTH,
-            width: BUILDING_WIDTH,
-            height: 120 + (i % 3) * 20,
-            color: (i % 2 === 0) ? '#3a0066' : '#280048',
-            signColor: (i % 3 === 0) ? '#ffe600' : (i % 3 === 1 ? '#00ffcc' : '#ff007f')
-        });
+    // Array fixo para paralaxe sem sobreposição
+const buildings = [];
+const NUM_BUILDINGS = 10;
+const BUILDING_WIDTH = 130;
+
+for (let i = 0; i < NUM_BUILDINGS; i++) {
+    buildings.push({
+        x: i * BUILDING_WIDTH,
+        width: BUILDING_WIDTH,
+        height: 120 + (i % 4) * 20,
+        color: (i % 2 === 0) ? '#3a0066' : '#280048',
+        signColor: (i % 3 === 0) ? '#ffe600' : (i % 3 === 1 ? '#00ffcc' : '#ff007f')
+    });
+}
+
+function drawBackground() {
+    // 1. Céu Degradê estilo JoJo
+    const grad = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+    grad.addColorStop(0, '#2a004f');
+    grad.addColorStop(0.5, '#660066');
+    grad.addColorStop(1, '#ff6600');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // 2. Montanhas ao Fundo
+    ctx.fillStyle = 'rgba(74, 0, 128, 0.4)';
+    ctx.beginPath();
+    const mountainOffset = (bgOffset * 0.15) % 200;
+    for (let x = -mountainOffset - 200; x < GAME_WIDTH + 200; x += 200) {
+        ctx.lineTo(x + 100, 160);
+        ctx.lineTo(x + 200, 280);
+        ctx.lineTo(x, 280);
     }
+    ctx.fill();
 
-    function drawBackground() {
-        // 1. Céu Degradê de Morioh
-        const grad = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
-        grad.addColorStop(0, '#2a004f');
-        grad.addColorStop(0.5, '#660066');
-        grad.addColorStop(1, '#ff6600');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    // 3. Movimento Contínuo dos Prédios de Morioh (Direita -> Esquerda)
+    const speedRatio = 0.4;
+    const totalWidth = NUM_BUILDINGS * BUILDING_WIDTH;
 
-        // 2. Montanhas Distantes (Movimento suave para a esquerda)
-        ctx.fillStyle = 'rgba(74, 0, 128, 0.4)';
-        ctx.beginPath();
-        const mountainOffset = (bgOffset * 0.15) % 200;
-        for (let x = -mountainOffset - 200; x < GAME_WIDTH + 200; x += 200) {
-            ctx.lineTo(x + 100, 160);
-            ctx.lineTo(x + 200, 280);
-            ctx.lineTo(x, 280);
+    buildings.forEach(b => {
+        let renderX = (b.x - (bgOffset * speedRatio)) % totalWidth;
+        if (renderX < -BUILDING_WIDTH) {
+            renderX += totalWidth;
         }
-        ctx.fill();
 
-        // 3. Prédios e Lojas de Morioh (Movimento Direita -> Esquerda Contínuo)
-        const speedRatio = 0.4;
-        buildings.forEach(b => {
-            // Desloca o prédio para a esquerda
-            let renderX = b.x - (bgOffset * speedRatio);
-            
-            // Quando sai completamente pela esquerda, re-reposiciona na extrema direita
-            const totalWidth = NUM_BUILDINGS * BUILDING_WIDTH;
-            while (renderX < -BUILDING_WIDTH) {
-                renderX += totalWidth;
-            }
+        // Corpo do Prédio
+        ctx.fillStyle = b.color;
+        ctx.fillRect(renderX, GROUND_Y - b.height, b.width - 10, b.height);
 
-            // Corpo do prédio
-            ctx.fillStyle = b.color;
-            ctx.fillRect(renderX, GROUND_Y - b.height, b.width - 10, b.height);
-
-            // Telhado
-            ctx.fillStyle = '#ff007f';
-            ctx.fillRect(renderX - 4, GROUND_Y - b.height - 6, b.width - 2, 6);
-
-            // Placa Comercial Japonesa
-            ctx.fillStyle = b.signColor;
-            ctx.fillRect(renderX + 15, GROUND_Y - b.height + 20, 25, 45);
-        });
-
-        // 4. Fiação Elétrica de Rua
-        ctx.strokeStyle = 'rgba(0, 255, 204, 0.35)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, 170);
-        ctx.lineTo(GAME_WIDTH, 170);
-        ctx.stroke();
-
-        // 5. Chão e Asfalto
+        // Telhado
         ctx.fillStyle = '#ff007f';
-        ctx.fillRect(0, GROUND_Y, GAME_WIDTH, 4);
+        ctx.fillRect(renderX - 4, GROUND_Y - b.height - 6, b.width - 2, 6);
 
-        ctx.fillStyle = '#1a0033';
-        ctx.fillRect(0, GROUND_Y + 4, GAME_WIDTH, GAME_HEIGHT - GROUND_Y - 4);
+        // Placa Comercial Japonesa
+        ctx.fillStyle = b.signColor;
+        ctx.fillRect(renderX + 15, GROUND_Y - b.height + 20, 25, 45);
+    });
 
-        // Linhas amareladas de perspectiva no chão
-        ctx.strokeStyle = '#ffe600';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        const groundLineOffset = bgOffset % 40;
-        for (let x = -groundLineOffset; x < GAME_WIDTH + 40; x += 40) {
-            ctx.moveTo(x, GROUND_Y + 4);
-            ctx.lineTo(x - 20, GAME_HEIGHT);
-        }
-        ctx.stroke();
+    // 4. Fiação Elétrica
+    ctx.strokeStyle = 'rgba(0, 255, 204, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 170);
+    ctx.lineTo(GAME_WIDTH, 170);
+    ctx.stroke();
+
+    // 5. Chão com Linhas Amarelas de Perspectiva
+    ctx.fillStyle = '#ff007f';
+    ctx.fillRect(0, GROUND_Y, GAME_WIDTH, 4);
+
+    ctx.fillStyle = '#1a0033';
+    ctx.fillRect(0, GROUND_Y + 4, GAME_WIDTH, GAME_HEIGHT - GROUND_Y - 4);
+
+    ctx.strokeStyle = '#ffe600';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const groundLineOffset = bgOffset % 40;
+    for (let x = -groundLineOffset; x < GAME_WIDTH + 40; x += 40) {
+        ctx.moveTo(x, GROUND_Y + 4);
+        ctx.lineTo(x - 20, GAME_HEIGHT);
     }
+    ctx.stroke();
+}
 
     // =========================================
     // OBSTÁCULOS: INIMIGOS COM FORMATOS PRÓPRIOS
@@ -383,32 +380,32 @@ document.addEventListener('DOMContentLoaded', () => {
     let obstacles = [];
 
     function spawnObstacle() {
-        const types = ['angelo', 'akira', 'kira'];
-        const chosen = types[Math.floor(Math.random() * types.length)];
-        
-        let width = 42;
-        let height = 50;
+    const types = ['angelo', 'akira', 'kira'];
+    const chosen = types[Math.floor(Math.random() * types.length)];
+    
+    let width = 40;
+    let height = 40;
 
-        if (chosen === 'angelo') {
-            width = 44;
-            height = 44; // Arredondado
-        } else if (chosen === 'akira') {
-            width = 40;
-            height = 55;
-        } else if (chosen === 'kira') {
-            width = 38;
-            height = 60;
-        }
-
-        obstacles.push({
-            x: GAME_WIDTH + 50,
-            y: GROUND_Y - height,
-            width: width,
-            height: height,
-            type: chosen,
-            passed: false
-        });
+    if (chosen === 'kira') {
+        width = 44;
+        height = 44; // Totalmente redondo (diâmetro = 44)
+    } else if (chosen === 'angelo') {
+        width = 40;
+        height = 50; // Formato de gota (mais alto com a ponta para cima)
+    } else if (chosen === 'akira') {
+        width = 45;
+        height = 45; // Quadrado
     }
+
+    obstacles.push({
+        x: GAME_WIDTH + 50,
+        y: GROUND_Y - height,
+        width: width,
+        height: height,
+        type: chosen,
+        passed: false
+    });
+}
 
     let particles = [];
     let textEffects = [];
@@ -441,17 +438,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // LOOP PRINCIPAL E REGRAS
     // =========================================
 
-    function resetGame() {
-        score = 0;
-        gameSpeed = 6;
-        obstacles = [];
-        particles = [];
-        textEffects = [];
-        player.y = GROUND_Y - player.height;
-        player.vy = 0;
-        player.isGrounded = true;
-        frameCount = 0;
-    }
+  function resetGame() {
+    score = 0;
+    gameSpeed = 6;
+    bgOffset = 0;
+    obstacles = [];
+    particles = [];
+    textEffects = [];
+    player.y = GROUND_Y - player.height;
+    player.vy = 0;
+    player.isGrounded = true;
+    player.canDoubleJump = false;
+    player.standActive = false;
+    player.standTimer = 0;
+    frameCount = 0;
+}
 
     function update() {
         if (gameState !== 'PLAYING') return;
@@ -526,62 +527,82 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         drawBackground();
 
-        // Renderização Individualizada e Detalhada dos Inimigos
-        obstacles.forEach(obs => {
-            ctx.save();
-            if (obs.type === 'angelo') {
-                // ANGELO (Aqua Necklace) - FORMATO REDONDO / GOTA D'ÁGUA
-                const cx = obs.x + obs.width / 2;
-                const cy = obs.y + obs.height / 2;
+       // Renderização Correta dos Inimigos
+obstacles.forEach(obs => {
+    ctx.save();
 
-                ctx.fillStyle = '#00ffcc';
-                ctx.beginPath();
-                ctx.arc(cx, cy, obs.width / 2, 0, Math.PI * 2);
-                ctx.fill();
+    if (obs.type === 'kira') {
+        // KIRA - FORMATO BOLINHA REDONDA
+        const radius = obs.width / 2;
+        const cx = obs.x + radius;
+        const cy = obs.y + radius;
 
-                // Detalhe Interno de Gotas Líquidas
-                ctx.fillStyle = '#006699';
-                ctx.beginPath();
-                ctx.arc(cx - 3, cy - 3, obs.width / 3.5, 0, Math.PI * 2);
-                ctx.fill();
+        // Corpo Redondo Rosa/Roxo
+        ctx.fillStyle = '#ff007f';
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
 
-                // Olhos e Brilho de Água
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(cx - 8, cy - 6, 4, 4);
-                ctx.fillRect(cx + 4, cy - 6, 4, 4);
-            } else if (obs.type === 'akira') {
-                // AKIRA OTOISHI (Red Hot Chili Pepper) - FORMATO ELÉTRICO
-                ctx.fillStyle = '#ffe600';
-                ctx.beginPath();
-                ctx.moveTo(obs.x + obs.width / 2, obs.y);
-                ctx.lineTo(obs.x + obs.width, obs.y + obs.height * 0.3);
-                ctx.lineTo(obs.x + obs.width * 0.7, obs.y + obs.height * 0.5);
-                ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
-                ctx.lineTo(obs.x, obs.y + obs.height);
-                ctx.lineTo(obs.x + obs.width * 0.3, obs.y + obs.height * 0.5);
-                ctx.closePath();
-                ctx.fill();
+        // Borda Roxa
+        ctx.strokeStyle = '#1a0033';
+        ctx.lineWidth = 3;
+        ctx.stroke();
 
-                // Efeito de Faísca Elétrica
-                ctx.fillStyle = '#ff007f';
-                ctx.fillRect(obs.x + 12, obs.y + 15, 16, 20);
-            } else if (obs.type === 'kira') {
-                // YOSHIKAGE KIRA (Killer Queen) - FORMATO ELEGANTE / CAVEIRA
-                ctx.fillStyle = '#ff007f';
-                ctx.fillRect(obs.x + 5, obs.y, obs.width - 10, obs.height);
+        // Detalhe Interno / Símbolo da Caveira
+        ctx.fillStyle = '#ffe600';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('💀', cx, cy);
 
-                // Gravata e Botões do Terno
-                ctx.fillStyle = '#1a0033';
-                ctx.fillRect(obs.x + 14, obs.y + 15, 10, 25);
+    } else if (obs.type === 'angelo') {
+        // ANGELO (Aqua Necklace) - FORMATO GOTA D'ÁGUA / CRISTAL (Ponta para cima, base arredondada)
+        const topX = obs.x + obs.width / 2;
+        const topY = obs.y;
+        const bottomY = obs.y + obs.height;
+        const leftX = obs.x;
+        const rightX = obs.x + obs.width;
 
-                // Emblema de Caveira Dourada
-                ctx.fillStyle = '#ffe600';
-                ctx.beginPath();
-                ctx.arc(obs.x + obs.width / 2, obs.y + 10, 6, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.restore();
-        });
+        ctx.fillStyle = '#00ffcc';
+        ctx.beginPath();
+        ctx.moveTo(topX, topY); // Ponta no topo
+        // Curva para o lado direito e base arredondada
+        ctx.bezierCurveTo(rightX, topY + obs.height * 0.4, rightX, bottomY, topX, bottomY);
+        // Curva para o lado esquerdo de volta à ponta
+        ctx.bezierCurveTo(leftX, bottomY, leftX, topY + obs.height * 0.4, topX, topY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Borda e Reflexo da Gota
+        ctx.strokeStyle = '#006699';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(topX - 4, topY + 12, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+    } else if (obs.type === 'akira') {
+        // AKIRA OTOISHI - FORMATO QUADRADO
+        ctx.fillStyle = '#ffe600';
+        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+
+        // Borda Rosa
+        ctx.strokeStyle = '#ff007f';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+
+        // Ícone/Detalhe Elétrico
+        ctx.fillStyle = '#1a0033';
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚡', obs.x + obs.width / 2, obs.y + obs.height / 2);
+    }
+
+    ctx.restore();
+});
 
         // Desenhar Josuke
         player.draw();
