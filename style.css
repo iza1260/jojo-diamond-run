@@ -108,7 +108,7 @@ body {
     text-transform: uppercase;
 }
 
-/* Canvas */
+/* Canvas Wrapper */
 .game-container {
     width: 100%;
     max-width: 940px;
@@ -290,7 +290,7 @@ canvas {
     transform: skewX(10deg);
 }
 
-/* Instruções Abaixo */
+/* Instruções */
 .how-to-play-banner {
     margin-top: 15px;
     background: rgba(0, 0, 0, 0.6);
