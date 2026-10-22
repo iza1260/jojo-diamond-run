@@ -1,6 +1,7 @@
 /**
- * JOJO: DIAMOND RUN!
- * Motor em Canvas 2D com Josuke, Crazy Diamond, Inimigos da Parte 4 e Trilha Funk/Guitarra
+ * JOJO: DIAMOND RUN! (Versão Corrigida)
+ * Canvas 2D Engine com Movimento de Paralaxe Contínuo em Morioh,
+ * Renderização Arredondada de Ângelo / Aqua Necklace e Detalhes de Josuke & Stand.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,11 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startBtn');
     const soundToggle = document.getElementById('soundToggle');
 
-    // Configurações
+    // Configurações do Jogo
     const GAME_HEIGHT = 400;
     const GAME_WIDTH = 900;
     const GROUND_Y = 320;
-    const VICTORY_SCORE = 1000; // Pontuação para encontrar Yoshikage Kira e vencer
+    const VICTORY_SCORE = 1000;
 
     let soundEnabled = true;
     let gameState = 'START'; // START, PLAYING, GAMEOVER, VICTORY
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     savedHighScoreEl.textContent = highScore;
 
     // =========================================
-    // TRILHA SONORA & SINTETIZADOR (Web Audio API)
+    // SISTEMA DE ÁUDIO SINTÉTICO (Web Audio API)
     // =========================================
     let audioCtx = null;
     let bgmInterval = null;
@@ -65,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
             osc.start(now);
             osc.stop(now + 0.15);
         } else if (type === 'crazyDiamond') {
-            // Impacto dramático com ruído e onda de serra (DORARARA!)
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
             osc.start(now);
             osc.stop(now + 0.35);
         } else if (type === 'victory') {
-            // Fanfarra de Vitória
             const notes = [523.25, 659.25, 783.99, 1046.50];
             notes.forEach((freq, idx) => {
                 const osc = audioCtx.createOscillator();
@@ -107,9 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Loop de BGM estilo Funk/Bass de JoJo
     let bgmStep = 0;
-    const bassNotes = [110, 110, 130.81, 110, 146.83, 130.81, 110, 164.81]; // A2, C3, D3, E3
+    const bassNotes = [110, 110, 130.81, 110, 146.83, 130.81, 110, 164.81];
     function startBGM() {
         if (bgmInterval) clearInterval(bgmInterval);
         bgmStep = 0;
@@ -117,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!soundEnabled || !audioCtx || gameState !== 'PLAYING') return;
             const now = audioCtx.currentTime;
             
-            // Linha de Baixo
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
@@ -130,12 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
             osc.start(now);
             osc.stop(now + 0.12);
 
-            // Stabs de Guitarra nos tempos pares
             if (bgmStep % 2 === 1) {
                 const gOsc = audioCtx.createOscillator();
                 const gGain = audioCtx.createGain();
                 gOsc.type = 'square';
-                gOsc.frequency.setValueAtTime(440, now); // A4
+                gOsc.frequency.setValueAtTime(440, now);
                 gGain.gain.setValueAtTime(0.08, now);
                 gGain.gain.linearRampToValueAtTime(0.01, now + 0.08);
                 gOsc.connect(gGain);
@@ -214,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         draw() {
             ctx.save();
 
-            // Stand Crazy Diamond (Quando ativado no pulo duplo ou no especial)
+            // Stand Crazy Diamond (Aura Flutuante Atrás do Jogador)
             if (this.standActive || !this.isGrounded) {
                 ctx.save();
                 ctx.shadowBlur = 18;
@@ -223,16 +219,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cdX = this.x - 22 + Math.sin(frameCount * 0.2) * 4;
                 const cdY = this.y - 30 + Math.cos(frameCount * 0.2) * 4;
 
-                // Silhueta/Aura do Crazy Diamond (Rosa e Ciano)
                 ctx.fillStyle = 'rgba(255, 0, 128, 0.45)';
                 ctx.beginPath();
                 ctx.ellipse(cdX + 25, cdY + 35, 30, 42, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Detalhes da armadura de Crazy Diamond
                 ctx.fillStyle = '#00ffcc';
-                ctx.fillRect(cdX + 15, cdY + 15, 20, 8); // Capacete/Visor
-                ctx.fillRect(cdX + 10, cdY + 30, 10, 15); // Ombreira
+                ctx.fillRect(cdX + 15, cdY + 15, 20, 8);
+                ctx.fillRect(cdX + 10, cdY + 30, 10, 15);
                 ctx.restore();
             }
 
@@ -242,11 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.ellipse(this.x + this.width / 2, GROUND_Y, 20, 5, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Desenhando Josuke Higashikata
-            // 1. Uniforme Gakuran Azul Marinho
+            // Josuke Higashikata - Uniforme Gakuran Azul Marinho
             ctx.fillStyle = '#0b132b';
             
-            // Pernas (Corrida)
+            // Pernas
             if (this.isGrounded) {
                 const legOffset = Math.sin(frameCount * 0.3) * 10;
                 ctx.fillRect(this.x + 10 + legOffset, this.y + 45, 10, 25);
@@ -256,20 +249,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillRect(this.x + 22, this.y + 45, 15, 15);
             }
 
-            // Torso (Jaqueta Aberta)
+            // Torso
             ctx.fillRect(this.x + 10, this.y + 18, 26, 28);
 
             // Detalhes Dourados (Broches de Coração/Âncora e Zíper)
             ctx.fillStyle = '#ffe600';
-            ctx.fillRect(this.x + 14, this.y + 22, 5, 5); // Broche 1
-            ctx.fillRect(this.x + 26, this.y + 22, 5, 5); // Broche 2
-            ctx.fillRect(this.x + 22, this.y + 28, 3, 18); // Zíper Dourado
+            ctx.fillRect(this.x + 14, this.y + 22, 5, 5);
+            ctx.fillRect(this.x + 26, this.y + 22, 5, 5);
+            ctx.fillRect(this.x + 22, this.y + 28, 3, 18);
 
-            // Camiseta/Peitoral por baixo
+            // Peitoral/Camiseta
             ctx.fillStyle = '#ff007f';
             ctx.fillRect(this.x + 18, this.y + 20, 8, 10);
 
-            // Gola Alta do Uniforme
+            // Gola Alta do Gakuran
             ctx.fillStyle = '#0b132b';
             ctx.fillRect(this.x + 12, this.y + 12, 20, 8);
 
@@ -277,11 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = '#ffe0bd';
             ctx.fillRect(this.x + 16, this.y + 8, 16, 12);
 
-            // 2. Cabelo Pompadour Icônico de Josuke
+            // Topete Pompadour Icônico de Josuke
             ctx.fillStyle = '#050814';
-            // Base do Cabelo
             ctx.fillRect(this.x + 12, this.y + 2, 22, 10);
-            // Topete Pompadour Projetado para Frente
             ctx.beginPath();
             ctx.ellipse(this.x + 28, this.y + 3, 16, 8, -0.2, 0, Math.PI * 2);
             ctx.fill();
@@ -295,7 +286,99 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // =========================================
-    // OBSTÁCULOS: INIMIGOS DA PARTE 4
+    // ESTRUTURA DO CENÁRIO DE MORIOH (Paralaxe Corrigido)
+    // =========================================
+    let bgOffset = 0;
+
+    // Prédios/Lojas com posições fixas sequenciais para movimento fluido
+    const buildings = [];
+    const NUM_BUILDINGS = 12;
+    const BUILDING_WIDTH = 120;
+    
+    for (let i = 0; i < NUM_BUILDINGS; i++) {
+        buildings.push({
+            x: i * BUILDING_WIDTH,
+            width: BUILDING_WIDTH,
+            height: 120 + (i % 3) * 20,
+            color: (i % 2 === 0) ? '#3a0066' : '#280048',
+            signColor: (i % 3 === 0) ? '#ffe600' : (i % 3 === 1 ? '#00ffcc' : '#ff007f')
+        });
+    }
+
+    function drawBackground() {
+        // 1. Céu Degradê de Morioh
+        const grad = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+        grad.addColorStop(0, '#2a004f');
+        grad.addColorStop(0.5, '#660066');
+        grad.addColorStop(1, '#ff6600');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+        // 2. Montanhas Distantes (Movimento suave para a esquerda)
+        ctx.fillStyle = 'rgba(74, 0, 128, 0.4)';
+        ctx.beginPath();
+        const mountainOffset = (bgOffset * 0.15) % 200;
+        for (let x = -mountainOffset - 200; x < GAME_WIDTH + 200; x += 200) {
+            ctx.lineTo(x + 100, 160);
+            ctx.lineTo(x + 200, 280);
+            ctx.lineTo(x, 280);
+        }
+        ctx.fill();
+
+        // 3. Prédios e Lojas de Morioh (Movimento Direita -> Esquerda Contínuo)
+        const speedRatio = 0.4;
+        buildings.forEach(b => {
+            // Desloca o prédio para a esquerda
+            let renderX = b.x - (bgOffset * speedRatio);
+            
+            // Quando sai completamente pela esquerda, re-reposiciona na extrema direita
+            const totalWidth = NUM_BUILDINGS * BUILDING_WIDTH;
+            while (renderX < -BUILDING_WIDTH) {
+                renderX += totalWidth;
+            }
+
+            // Corpo do prédio
+            ctx.fillStyle = b.color;
+            ctx.fillRect(renderX, GROUND_Y - b.height, b.width - 10, b.height);
+
+            // Telhado
+            ctx.fillStyle = '#ff007f';
+            ctx.fillRect(renderX - 4, GROUND_Y - b.height - 6, b.width - 2, 6);
+
+            // Placa Comercial Japonesa
+            ctx.fillStyle = b.signColor;
+            ctx.fillRect(renderX + 15, GROUND_Y - b.height + 20, 25, 45);
+        });
+
+        // 4. Fiação Elétrica de Rua
+        ctx.strokeStyle = 'rgba(0, 255, 204, 0.35)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 170);
+        ctx.lineTo(GAME_WIDTH, 170);
+        ctx.stroke();
+
+        // 5. Chão e Asfalto
+        ctx.fillStyle = '#ff007f';
+        ctx.fillRect(0, GROUND_Y, GAME_WIDTH, 4);
+
+        ctx.fillStyle = '#1a0033';
+        ctx.fillRect(0, GROUND_Y + 4, GAME_WIDTH, GAME_HEIGHT - GROUND_Y - 4);
+
+        // Linhas amareladas de perspectiva no chão
+        ctx.strokeStyle = '#ffe600';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const groundLineOffset = bgOffset % 40;
+        for (let x = -groundLineOffset; x < GAME_WIDTH + 40; x += 40) {
+            ctx.moveTo(x, GROUND_Y + 4);
+            ctx.lineTo(x - 20, GAME_HEIGHT);
+        }
+        ctx.stroke();
+    }
+
+    // =========================================
+    // OBSTÁCULOS: INIMIGOS COM FORMATOS PRÓPRIOS
     // =========================================
     let obstacles = [];
 
@@ -303,17 +386,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const types = ['angelo', 'akira', 'kira'];
         const chosen = types[Math.floor(Math.random() * types.length)];
         
-        let width = 40;
+        let width = 42;
         let height = 50;
 
         if (chosen === 'angelo') {
-            width = 38;
-            height = 48;
+            width = 44;
+            height = 44; // Arredondado
         } else if (chosen === 'akira') {
-            width = 42;
+            width = 40;
             height = 55;
         } else if (chosen === 'kira') {
-            width = 35;
+            width = 38;
             height = 60;
         }
 
@@ -327,7 +410,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Partículas e Efeitos Onomatopéicos
     let particles = [];
     let textEffects = [];
 
@@ -356,72 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================
-    // CENÁRIO DE MORIOH (Parallax)
-    // =========================================
-    let bgOffset = 0;
-
-    function drawBackground() {
-        // Céu Amarelo/Roxo estilo Mangá de Morioh
-        const grad = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
-        grad.addColorStop(0, '#2a004f');
-        grad.addColorStop(0.5, '#660066');
-        grad.addColorStop(1, '#ff6600');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-        // Montanhas de Morioh (Fundo Distante)
-        ctx.fillStyle = 'rgba(74, 0, 128, 0.4)';
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-            const mx = ((i * 200) - (bgOffset * 0.1)) % (GAME_WIDTH + 200) - 100;
-            ctx.lineTo(mx + 100, 160);
-            ctx.lineTo(mx + 200, 280);
-            ctx.lineTo(mx, 280);
-        }
-        ctx.fill();
-
-        // Casario e Lojas de Morioh (Camada Média)
-        for (let i = 0; i < 8; i++) {
-            const bx = ((i * 140) - (bgOffset * 0.4)) % (GAME_WIDTH + 140) - 70;
-            // Prédio
-            ctx.fillStyle = '#3a0066';
-            ctx.fillRect(bx, 190, 110, 130);
-            // Telhado
-            ctx.fillStyle = '#ff007f';
-            ctx.fillRect(bx - 5, 180, 120, 10);
-            // Placa Japonesa
-            ctx.fillStyle = '#ffe600';
-            ctx.fillRect(bx + 15, 210, 20, 45);
-        }
-
-        // Postes de Luz e Fiação de Rua
-        ctx.strokeStyle = 'rgba(0, 255, 204, 0.3)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, 170);
-        ctx.lineTo(GAME_WIDTH, 170);
-        ctx.stroke();
-
-        // Chão e Asfalto
-        ctx.fillStyle = '#ff007f';
-        ctx.fillRect(0, GROUND_Y, GAME_WIDTH, 4);
-
-        ctx.fillStyle = '#1a0033';
-        ctx.fillRect(0, GROUND_Y + 4, GAME_WIDTH, GAME_HEIGHT - GROUND_Y - 4);
-
-        // Linhas de perspectiva amarela no chão
-        ctx.strokeStyle = '#ffe600';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        for (let x = -(bgOffset % 40); x < GAME_WIDTH; x += 40) {
-            ctx.moveTo(x, GROUND_Y + 4);
-            ctx.lineTo(x - 20, GAME_HEIGHT);
-        }
-        ctx.stroke();
-    }
-
-    // =========================================
-    // LOOP DO JOGO E REGRAS
+    // LOOP PRINCIPAL E REGRAS
     // =========================================
 
     function resetGame() {
@@ -443,28 +460,23 @@ document.addEventListener('DOMContentLoaded', () => {
         bgOffset += gameSpeed;
         score += 1;
 
-        // Aumento progressivo da velocidade
         if (frameCount % 300 === 0) {
             gameSpeed += 0.5;
             spawnTextEffect(GAME_WIDTH / 2 - 50, 100, 'SPEED UP!');
         }
 
-        // Checar Vitória ao chegar no final de Morioh (Kira)
         const currentScoreVal = Math.floor(score / 5);
         if (currentScoreVal >= VICTORY_SCORE) {
             triggerVictory();
             return;
         }
 
-        // Atualizar Jogador
         player.update();
 
-        // Gerar Inimigos
         if (frameCount % Math.max(45, Math.floor(1100 / gameSpeed)) === 0 && Math.random() > 0.25) {
             spawnObstacle();
         }
 
-        // Atualizar Inimigos
         for (let i = obstacles.length - 1; i >= 0; i--) {
             const obs = obstacles[i];
             obs.x -= gameSpeed;
@@ -477,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Colisão
+            // Colisão com Hitbox Ajustada
             const padding = 6;
             if (
                 player.x + padding < obs.x + obs.width &&
@@ -493,7 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Partículas
         for (let i = particles.length - 1; i >= 0; i--) {
             const p = particles[i];
             p.x += p.vx;
@@ -502,7 +513,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.life <= 0) particles.splice(i, 1);
         }
 
-        // Textos
         for (let i = textEffects.length - 1; i >= 0; i--) {
             const t = textEffects[i];
             t.y -= 1;
@@ -516,33 +526,59 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         drawBackground();
 
-        // Desenhando Inimigos de Morioh
+        // Renderização Individualizada e Detalhada dos Inimigos
         obstacles.forEach(obs => {
             ctx.save();
             if (obs.type === 'angelo') {
-                // Angelo / Aqua Necklace (Aquático/Azul)
+                // ANGELO (Aqua Necklace) - FORMATO REDONDO / GOTA D'ÁGUA
+                const cx = obs.x + obs.width / 2;
+                const cy = obs.y + obs.height / 2;
+
                 ctx.fillStyle = '#00ffcc';
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.beginPath();
+                ctx.arc(cx, cy, obs.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Detalhe Interno de Gotas Líquidas
                 ctx.fillStyle = '#006699';
-                ctx.fillRect(obs.x + 5, obs.y + 10, obs.width - 10, obs.height - 15);
-                ctx.fillStyle = '#fff';
-                ctx.fillText('💧', obs.x + 10, obs.y + 30);
+                ctx.beginPath();
+                ctx.arc(cx - 3, cy - 3, obs.width / 3.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Olhos e Brilho de Água
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 8, cy - 6, 4, 4);
+                ctx.fillRect(cx + 4, cy - 6, 4, 4);
             } else if (obs.type === 'akira') {
-                // Akira Otoishi / Red Hot Chili Pepper (Elétrico/Amarelo)
+                // AKIRA OTOISHI (Red Hot Chili Pepper) - FORMATO ELÉTRICO
                 ctx.fillStyle = '#ffe600';
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.beginPath();
+                ctx.moveTo(obs.x + obs.width / 2, obs.y);
+                ctx.lineTo(obs.x + obs.width, obs.y + obs.height * 0.3);
+                ctx.lineTo(obs.x + obs.width * 0.7, obs.y + obs.height * 0.5);
+                ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
+                ctx.lineTo(obs.x, obs.y + obs.height);
+                ctx.lineTo(obs.x + obs.width * 0.3, obs.y + obs.height * 0.5);
+                ctx.closePath();
+                ctx.fill();
+
+                // Efeito de Faísca Elétrica
                 ctx.fillStyle = '#ff007f';
-                ctx.fillRect(obs.x + 8, obs.y + 8, obs.width - 16, obs.height - 16);
-                ctx.fillStyle = '#fff';
-                ctx.fillText('⚡', obs.x + 12, obs.y + 35);
+                ctx.fillRect(obs.x + 12, obs.y + 15, 16, 20);
             } else if (obs.type === 'kira') {
-                // Yoshikage Kira / Killer Queen (Elegante/Caveira)
+                // YOSHIKAGE KIRA (Killer Queen) - FORMATO ELEGANTE / CAVEIRA
                 ctx.fillStyle = '#ff007f';
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.fillRect(obs.x + 5, obs.y, obs.width - 10, obs.height);
+
+                // Gravata e Botões do Terno
                 ctx.fillStyle = '#1a0033';
-                ctx.fillRect(obs.x + 6, obs.y + 12, obs.width - 12, obs.height - 20);
+                ctx.fillRect(obs.x + 14, obs.y + 15, 10, 25);
+
+                // Emblema de Caveira Dourada
                 ctx.fillStyle = '#ffe600';
-                ctx.fillText('💀', obs.x + 8, obs.y + 35);
+                ctx.beginPath();
+                ctx.arc(obs.x + obs.width / 2, obs.y + 10, 6, 0, Math.PI * 2);
+                ctx.fill();
             }
             ctx.restore();
         });
@@ -559,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         });
 
-        // Desenhar Textos Onomatopéicos
+        // Desenhar Onomatopéias
         textEffects.forEach(t => {
             ctx.save();
             ctx.globalAlpha = t.life;
